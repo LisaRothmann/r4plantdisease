@@ -1,0 +1,3 @@
+"0","ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +"
+"0","  geom_point(aes(colour = species, shape = species)) +"
+"0","  geom_smooth(method = ""lm"", se = FALSE)"

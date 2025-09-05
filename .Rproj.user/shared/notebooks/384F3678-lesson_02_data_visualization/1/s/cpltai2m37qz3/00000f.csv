@@ -1,0 +1,8 @@
+"0","# Install once (uncomment the next lines if needed)"
+"0","# install.packages(""tidyverse"")"
+"0","# install.packages(""palmerpenguins"")"
+"0","# install.packages(""ggthemes"")"
+"0",""
+"0","library(tidyverse)"
+"0","library(palmerpenguins)"
+"0","library(ggthemes)"

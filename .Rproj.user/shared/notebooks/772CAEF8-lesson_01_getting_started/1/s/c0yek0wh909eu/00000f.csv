@@ -1,0 +1,6 @@
+"0","# Create a tibble"
+"0","library(tidyverse)"
+"0","tbl <- tibble(x = 1:5, y = x^2)"
+"0",""
+"0","# Make a simple plot"
+"0","ggplot(tbl, aes(x, y)) + geom_point()"
