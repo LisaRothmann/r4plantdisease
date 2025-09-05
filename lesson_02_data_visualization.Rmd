@@ -1,0 +1,261 @@
+---
+title: "McLab — Lesson 2: Data Visualization with ggplot2"
+author: "LA Rothmann"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = FALSE)
+```
+
+# 1 Data visualization
+
+> “The simple graph has brought more information to the data analyst’s mind than any other device.” — John Tukey
+
+This lesson introduces **ggplot2** and the idea of building plots layer-by-layer using the *grammar of graphics*. We will start with a scatterplot, then add aesthetics, layers, faceting, and finish with saving plots and common troubleshooting tips. For deeper reading, see the free online book *R for Data Science (2e)*: <https://r4ds.hadley.nz/>.
+
+## 1.1 Prerequisites
+
+We will use **tidyverse** (for ggplot2 and friends), **palmerpenguins** (example dataset), and **ggthemes** (color-blind safe palette).
+
+```{r packages}
+# Install once (uncomment the next lines if needed)
+# install.packages("tidyverse")
+# install.packages("palmerpenguins")
+# install.packages("ggthemes")
+
+library(tidyverse)
+library(palmerpenguins)
+library(ggthemes)
+```
+
+## 1.2 First steps
+
+**Question:** Do penguins with longer flippers generally weigh more?  
+We’ll explore the relationship between `flipper_length_mm` and `body_mass_g`, and check whether the trend varies by `species` or `island`.
+
+### 1.2.1 Meet the data
+
+A *data frame / tibble* stores variables (columns) and observations (rows).
+
+```{r peek-data}
+penguins
+```
+
+Get a compact overview:
+
+```{r glimpse}
+glimpse(penguins)
+```
+
+Key variables for this lesson:
+
+- `species` (Adelie, Chinstrap, Gentoo) — categorical  
+- `flipper_length_mm` — numeric  
+- `body_mass_g` — numeric
+
+### 1.2.2 Ultimate goal (target plot)
+
+We aim to show the relationship between flipper length and body mass, with species distinguished by colour and shape, plus a single overall best-fit line.
+
+### 1.2.3 Creating your first ggplot
+
+Start with an empty canvas by supplying the data:
+
+```{r empty-canvas}
+ggplot(data = penguins)
+```
+
+Map variables to aesthetics (x and y):
+
+```{r map-aes}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g))
+```
+
+Add a **geom** to represent the data (points → scatterplot):
+
+```{r scatter-basic}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point()
+```
+
+> *Note on warnings:* Missing values are common in real data; ggplot2 warns when rows are dropped because required aesthetics contain NAs.
+
+## 1.3 Adding aesthetics and layers
+
+Colour points by species **in the mapping**:
+
+```{r scatter-by-species}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g, colour = species)) +
+  geom_point()
+```
+
+Add a **smooth** (best-fit) line using a linear model:
+
+```{r scatter-with-smooth-by-species}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g, colour = species)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Use a **single** overall line by mapping `colour = species` only to the points:
+
+```{r scatter-with-global-line}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point(aes(colour = species)) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Make the plot more accessible by adding **shape** as well as colour:
+
+```{r scatter-colour-shape}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point(aes(colour = species, shape = species)) +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Improve labels and use a colour-blind safe palette:
+
+```{r labelled-theme}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point(aes(colour = species, shape = species), alpha = 0.9) +
+  geom_smooth(method = "lm", se = FALSE) +
+  labs(
+    title = "Body mass vs. flipper length",
+    subtitle = "Palmer Archipelago penguins",
+    x = "Flipper length (mm)", y = "Body mass (g)",
+    colour = "Species", shape = "Species"
+  ) +
+  ggthemes::scale_color_colorblind()
+```
+
+## 1.4 Visualizing distributions
+
+### 1.4.1 Categorical variable
+
+Bar chart of counts per species:
+
+```{r bar-species}
+ggplot(penguins, aes(x = species)) +
+  geom_bar()
+```
+
+Order by frequency using `forcats::fct_infreq`:
+
+```{r bar-species-ordered}
+ggplot(penguins, aes(x = forcats::fct_infreq(species))) +
+  geom_bar()
+```
+
+### 1.4.2 Numerical variable
+
+Histogram of body mass (experiment with `binwidth`):
+
+```{r hist-bodymass}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+```
+
+Density plot (a smoothed alternative):
+
+```{r density-bodymass}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+```
+
+## 1.5 Visualizing relationships
+
+### 1.5.1 One numerical + one categorical
+
+Side-by-side boxplots:
+
+```{r boxplot-species}
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+```
+
+Density by species (using colour & fill + transparency):
+
+```{r density-by-species}
+ggplot(penguins, aes(x = body_mass_g, colour = species, fill = species)) +
+  geom_density(alpha = 0.5, linewidth = 0.7)
+```
+
+### 1.5.2 Two numerical variables
+
+Basic scatterplot:
+
+```{r scatter-two-num}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+```
+
+### 1.5.3 Three or more variables
+
+Add more aesthetics (use sparingly to avoid clutter):
+
+```{r scatter-3vars}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point(aes(colour = species, shape = island))
+```
+
+Facet by island:
+
+```{r facet-island}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point(aes(colour = species, shape = species)) +
+  facet_wrap(~ island)
+```
+
+## 1.6 Saving your plots
+
+`ggsave()` saves the **most recent** plot:
+
+```{r save-plot, eval=FALSE}
+ggplot(penguins, aes(flipper_length_mm, body_mass_g)) +
+  geom_point()
+ggsave("penguin-plot.png", width = 6, height = 4, dpi = 300)
+```
+
+> Change the extension (e.g., `.pdf`) to save other formats. See `?ggsave` for options.
+
+## 1.7 Common problems (quick tips)
+
+- Place `+` **at the end** of a line, not the beginning.  
+- A leading `+` in the Console means the command isn’t complete—press **Esc** and re-run.  
+- Compare your code closely to examples—punctuation matters.  
+- Use `?function_name` or **F1** in RStudio to open help pages.  
+- Read warnings about **missing values**; decide whether to filter or handle NAs.
+
+## 1.8 Exercises
+
+> Try answering in your own `.Rmd` (`exercises.Rmd`) or below each question by inserting a new chunk.
+
+1. How many rows and columns are in `penguins`? Use `glimpse()` or `dplyr::summarise()`.
+2. Make a scatterplot of `bill_depth_mm` vs `bill_length_mm`. What pattern do you see?
+3. Colour that plot by `species`. What changes?
+4. Create a histogram of `body_mass_g` and try at least three different `binwidth` values.
+5. Why does this error? How can you fix it?
+   ```r
+   ggplot(data = penguins) + geom_point()
+   ```
+6. Use `geom_point(na.rm = TRUE)` and describe what `na.rm` does.
+7. Add a caption to one of your plots using `labs(caption = "Data: palmerpenguins")`.
+8. Map `bill_depth_mm` to colour (global vs geom-level). What’s the difference?
+9. Create two stacked bar plots:
+   ```r
+   ggplot(penguins, aes(island, fill = species)) + geom_bar(position = "fill")
+   ggplot(penguins, aes(species, fill = island)) + geom_bar(position = "fill")
+   ```
+   What question does each answer?
+10. Save your favourite plot with `ggsave()` (PNG and then PDF).
+
+---
+
+*Credits:* Data from **palmerpenguins** (Horst, Hill & Gorman, 2020). For conflicts between packages, see <https://conflicted.r-lib.org/>.

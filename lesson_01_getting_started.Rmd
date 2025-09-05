@@ -1,0 +1,142 @@
+---
+title: "McLab R & RStudio Resource Guide — Lesson 1"
+author: "LA Rothmann"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = FALSE)
+```
+
+# Welcome
+
+This resource supports everyone in the lab—from absolute beginners to those with some experience—as we build shared skills in data analysis and visualisation using R. You’ll find curated learning materials, useful links, and our preferred ways of structuring R projects. The goal is not just to learn R, but to build confidence and a collaborative space for experimentation, problem‑solving, and reproducible science.
+
+# What’s in this lesson
+
+- Set up RStudio and explore the four panes
+- Create a new RStudio Project and basic folders
+- Create and navigate an R Markdown file
+- Install and load packages (markdown, tidyverse)
+- Understand functions, packages, and libraries (Shalya’s TV show analogy)
+- Run your first code chunks and view objects in the Environment
+
+# 1) RStudio layout (four panes)
+
+Show all panes: **View → Panes → Show All Panes**.
+
+Recommended layout:
+
+- **Top-left:** Script editor  
+- **Bottom-left:** Console  
+- **Top-right:** Environment / History  
+- **Bottom-right:** Files, Plots, Packages, Help, Viewer
+
+> Tip: Drag pane dividers to resize. If something’s missing, reopen via **View → Panes**.
+
+# 2) Create a Project
+
+Create a project via **File → New Project → New Directory → New Project**. Name it (e.g., `mclab-r-intro`) and choose a folder (Documents or GitHub). You should now see a blue cube with your project name in the top-right, and a `.Rproj` file in the folder.
+
+Create a simple folder for outputs from within R (safe to re-run; it only creates if missing):
+
+```{r create_folders}
+if (!dir.exists("viz")) dir.create("viz")
+if (!dir.exists("data")) dir.create("data")
+if (!dir.exists("resources")) dir.create("resources")
+list.dirs(recursive = FALSE)
+```
+
+# 3) Create an R Markdown file
+
+Create a new file via **File → New File → R Markdown…**, then **Save** inside your project (e.g., `notes.Rmd`). Use the **Outline** pane (top-right of the editor) to jump between headings and chunks as your file grows.
+
+# 4) Install vs Load (packages & libraries)
+
+- **Install** (do once per computer): adds a package to your system.  
+- **Load** (do each session): makes the package available in your R session.
+
+Install packages (run once; set `eval=FALSE` so this document knits even if packages are already present or you are offline):
+
+```{r install_packages, eval=FALSE}
+install.packages("markdown")
+install.packages("tidyverse")
+```
+
+Load a package (run each session):
+
+```{r load_packages}
+library(tidyverse)
+```
+
+## Shalya’s TV show analogy
+
+Learning R without understanding packages and functions is like starting a TV series halfway through—you don’t know the characters or the settings yet.
+
+- **Functions** are the **characters** (e.g., `mean()`, `ggplot()`).  
+- **Packages** are the **seasons** (e.g., `ggplot2` groups many plotting functions).  
+- **Libraries** are the **shelf** where installed seasons live. Installing is like buying the box set (once); loading is like putting the disc in the player (each time).
+
+> Diagram placeholder (optional): put an image file at `resources/install-vs-load.png` and knit again.
+
+```{r show_diagram, echo=FALSE, warning=FALSE, message=FALSE}
+img_path <- file.path("resources", "install-vs-load.png")
+if (file.exists(img_path)) {
+  knitr::include_graphics(img_path)
+} else {
+  cat("Add your diagram at `resources/install-vs-load.png` to display it here.")
+}
+```
+
+# 5) Working in chunks (your first code)
+
+Below, we run a quick calculation, assign objects, and multiply them. After running, look in the **Environment** pane—`x` and `y` will appear with their values.
+
+```{r first_chunk}
+5 + 9
+x <- 5 + 9
+y <- 2
+x * y
+```
+
+Optionally, list objects now in your environment:
+
+```{r list_env}
+ls()
+```
+
+# 6) Reading & practice
+
+From **R for Data Science (2e)**:
+- Introduction
+- 1: Data visualisation
+- 2: Workflow: basics
+
+Link: <https://r4ds.hadley.nz/>
+
+Practice ideas (try in your own `notes.Rmd`):
+
+```{r practice, eval=FALSE}
+# Create a tibble
+library(tidyverse)
+tbl <- tibble(x = 1:5, y = x^2)
+
+# Make a simple plot
+ggplot(tbl, aes(x, y)) + geom_point()
+
+# Add a new heading and a chunk in your own Rmd
+```
+
+# Resources Library
+
+- R4PDE.net  
+- Introduction to R for Biologists  
+- Inquiry and Analysis in Biology  
+- An Introduction to R for Research
+
+# What’s next
+
+- Add a small dataset and build your first plot with `ggplot2`
+- Introduce project file paths and workflow basics
+- Connect the project to GitHub (fork/clone) and practise commits

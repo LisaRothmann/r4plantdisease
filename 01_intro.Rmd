@@ -1,0 +1,15 @@
+---
+title: "McLab R & RStudio Resource Guide — Lesson 1"
+subtitle: "Getting Started in RStudio"
+author: "LA Rothmann"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    toc_float: true
+    number_sections: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = TRUE, warning = FALSE)
